@@ -6,6 +6,7 @@ import { useRouter } from 'src/routes/hooks';
 
 import { useRegisterMutation } from '../api';
 import { SimplifiedRegistrationForm } from './components/SimplifiedRegistrationForm';
+import { toast } from 'src/components/snackbar';
 
 const STORAGE_KEY = 'registration_data';
 
@@ -16,7 +17,7 @@ export default function SignUpView() {
   });
 
   const [registrationError, setRegistrationError] = useState<string | null>(null);
-  const [register] = useRegisterMutation();
+  const [register, registrationResult] = useRegisterMutation();
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
@@ -41,14 +42,6 @@ export default function SignUpView() {
 
         setFormData(registrationData);
         await register(registrationData);
-
-        // Clear localStorage after successful registration
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem('registration_form_values');
-        localStorage.removeItem('registration_user_verified');
-        localStorage.removeItem('registration_otp_verified');
-
-        router.push('/auth/sign-in');
       } catch (error) {
         console.error('Registration error:', error);
         setRegistrationError(
@@ -58,6 +51,22 @@ export default function SignUpView() {
     },
     [register]
   );
+
+  useEffect(() => {
+    if (registrationResult.isSuccess) {
+      // Clear localStorage after successful registration
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem('registration_form_values');
+      localStorage.removeItem('registration_user_verified');
+      localStorage.removeItem('registration_otp_verified');
+
+      toast.success('Registration successful! Please sign in.');
+
+      router.push('/auth/sign-in');
+    } else if (registrationResult.isError) {
+      toast.error('Registration failed. Please try again.');
+    }
+  });
 
   return (
     <Box
@@ -82,9 +91,6 @@ export default function SignUpView() {
             >
               Registration
             </Typography>
-            <Box>
-              <Button onClick={() => localStorage.clear()}>Clear</Button>
-            </Box>
 
             {registrationError && (
               <Alert severity="error" onClose={() => setRegistrationError(null)}>
