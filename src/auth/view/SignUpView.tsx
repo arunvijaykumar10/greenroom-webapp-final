@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Card, Stack, Alert, Typography, CardContent, Button } from '@mui/material';
+import { Box, Card, Stack, Alert, Typography, CardContent } from '@mui/material';
 
 import { useRouter } from 'src/routes/hooks';
 
+import { toast } from 'src/components/snackbar';
+
 import { useRegisterMutation } from '../api';
 import { SimplifiedRegistrationForm } from './components/SimplifiedRegistrationForm';
-import { toast } from 'src/components/snackbar';
 
 const STORAGE_KEY = 'registration_data';
 

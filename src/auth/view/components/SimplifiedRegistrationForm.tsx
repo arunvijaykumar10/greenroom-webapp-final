@@ -217,7 +217,7 @@ export const SimplifiedRegistrationForm = ({ onSubmit, formData }: FormProps) =>
 
       <Field.Text
         name="confirm_password"
-        label="Confirm new password"
+        label="Confirm Password *"
         type={showPassword.value ? 'text' : 'password'}
         slotProps={{
           input: {
