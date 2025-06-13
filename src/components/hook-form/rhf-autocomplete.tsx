@@ -34,7 +34,6 @@ export function RHFAutocomplete({
   const { control, setValue } = useFormContext();
 
   const { textfield, ...otherSlotProps } = slotProps ?? {};
-
   return (
     <Controller
       name={name}
@@ -43,7 +42,9 @@ export function RHFAutocomplete({
         <Autocomplete
           {...field}
           id={`rhf-autocomplete-${name}`}
-          onChange={(event, newValue) => setValue(name, newValue, { shouldValidate: true })}
+          onChange={(event, newValue) =>
+            setValue(name, newValue, { shouldValidate: true, shouldDirty: true })
+          }
           renderInput={(params) => (
             <TextField
               {...params}
@@ -52,14 +53,6 @@ export function RHFAutocomplete({
               placeholder={placeholder}
               error={!!error}
               helperText={error?.message ?? helperText}
-              slotProps={{
-                ...textfield?.slotProps,
-                htmlInput: {
-                  ...params.inputProps,
-                  autoComplete: 'new-password',
-                  ...textfield?.slotProps?.htmlInput,
-                },
-              }}
             />
           )}
           {...other}

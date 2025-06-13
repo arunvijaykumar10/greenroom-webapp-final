@@ -1,133 +1,54 @@
-import _ from 'lodash';
 import { useState, useEffect, useCallback } from 'react';
 
-import {
-  Box,
-  Step,
-  Card,
-  Stack,
-  Alert,
-  Stepper,
-  StepLabel,
-  Typography,
-  CardContent,
-} from '@mui/material';
+import { Box, Card, Stack, Alert, Typography, CardContent, Button } from '@mui/material';
 
 import { useRouter } from 'src/routes/hooks';
 
-import { toast } from 'src/components/snackbar';
-
-import { StepIndex } from '../types';
 import { useRegisterMutation } from '../api';
-import { RegistrationForm } from './components';
+import { SimplifiedRegistrationForm } from './components/SimplifiedRegistrationForm';
 
-import type {
-  PayrollDetails,
-  UserInformation,
-  CompanyInformation,
-  RegistrationFormData,
-} from '../types';
-
-const REGISTRATION_STEPS = [
-  'Company Information',
-  'User Details',
-  'Payroll Details',
-  'Review & Submit',
-];
 const STORAGE_KEY = 'registration_data';
 
 export default function SignUpView() {
-  const [currentStep, setCurrentStep] = useState<StepIndex>(() => {
-    const savedStep = localStorage.getItem('registration_step');
-    return savedStep ? parseInt(savedStep, 10) : StepIndex.CompanyInfo;
-  });
-
-  const [formData, setFormData] = useState<Partial<RegistrationFormData>>(() => {
+  const [formData, setFormData] = useState<any>(() => {
     const savedData = localStorage.getItem(STORAGE_KEY);
     return savedData ? JSON.parse(savedData) : {};
   });
 
-  const [registrationComplete, setRegistrationComplete] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
   const [register] = useRegisterMutation();
 
-  // Save to localStorage whenever formData or currentStep changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-    localStorage.setItem('registration_step', currentStep.toString());
-  }, [formData, currentStep]);
+  }, [formData]);
 
   const router = useRouter();
 
-  const goToNextStep = () =>
-    setCurrentStep((prevStep) => Math.min(prevStep + 1, StepIndex.Summary));
-
-  const goToPreviousStep = () =>
-    setCurrentStep((prevStep) => Math.max(prevStep - 1, StepIndex.CompanyInfo));
-
-  const handleStepSubmit = useCallback(
-    async (stepData: any) => {
+  const handleSubmit = useCallback(
+    async (formValues: any) => {
       try {
-        switch (currentStep) {
-          case StepIndex.CompanyInfo:
-            setFormData((prev) => ({
-              ...prev,
-              companyInfo: {
-                entity_name: stepData.entity_name,
-                entity_type: stepData.entity_type,
-                fein: stepData.fein,
-                address_line_1: stepData.address_line_1,
-                address_line_2: stepData.address_line_2,
-                city: stepData.city,
-                state: stepData.state,
-                zip_code: stepData.zip_code,
-                phone_number: stepData.phone_number,
-                nys_unemployment_registration_number: stepData.nys_unemployment_registration_number,
-              } as CompanyInformation,
-            }));
-            goToNextStep();
-            break;
+        const registrationData = {
+          companyInfo: {
+            name: formValues.entity_name,
+            organization_type: formValues.entity_type,
+          },
+          user_profile: {
+            first_name: formValues.first_name,
+            last_name: formValues.last_name,
+            email: formValues.email_address,
+          },
+        };
 
-          case StepIndex.UserInfo:
-            setFormData((prev) => ({
-              ...prev,
-              userInfo: {
-                first_name: stepData.first_name,
-                last_name: stepData.last_name,
-                email_address: stepData.email_address,
-                role_title: stepData.role_title,
-              } as UserInformation,
-            }));
-            goToNextStep();
-            break;
+        setFormData(registrationData);
+        await register(registrationData);
 
-          case StepIndex.Payroll:
-            setFormData((prev) => ({
-              ...prev,
-              payrollInfo: {
-                pay_frequency: stepData.pay_frequency,
-                pay_period: stepData.pay_period,
-                payroll_start_date: stepData.payroll_start_date,
-                check_number: parseInt(stepData.check_number, 10) || 1,
-              } as PayrollDetails,
-            }));
-            goToNextStep();
-            break;
+        // Clear localStorage after successful registration
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem('registration_form_values');
+        localStorage.removeItem('registration_user_verified');
+        localStorage.removeItem('registration_otp_verified');
 
-          case StepIndex.Summary:
-            if (formData.companyInfo && formData.userInfo && formData.payrollInfo) {
-              register(formData);
-              localStorage.removeItem(STORAGE_KEY);
-              localStorage.removeItem('registration_step');
-              localStorage.removeItem('registration_user_verified');
-              localStorage.removeItem('registration_otp_verified');
-              localStorage.removeItem('registration_form_values');
-            }
-            break;
-
-          default:
-            toast.error('Invalid step.');
-        }
+        router.push('/auth/sign-in');
       } catch (error) {
         console.error('Registration error:', error);
         setRegistrationError(
@@ -135,37 +56,8 @@ export default function SignUpView() {
         );
       }
     },
-    [currentStep, formData, router]
+    [register]
   );
-
-  if (registrationComplete) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          bgcolor: 'background.default',
-          py: 5,
-        }}
-      >
-        <Card sx={{ width: '100%', maxWidth: 800 }}>
-          <CardContent>
-            <Stack spacing={4} alignItems="center">
-              <Typography variant="h5" textAlign="center">
-                Registration Complete!
-              </Typography>
-
-              <Typography variant="body1" textAlign="center">
-                You will be redirected to the login page shortly...
-              </Typography>
-            </Stack>
-          </CardContent>
-        </Card>
-      </Box>
-    );
-  }
 
   return (
     <Box
@@ -184,12 +76,15 @@ export default function SignUpView() {
             <Typography
               variant="h4"
               textAlign="center"
-              fontWeight='bold'
+              fontWeight="bold"
               color="primary"
               gutterBottom
             >
               Registration
             </Typography>
+            <Box>
+              <Button onClick={() => localStorage.clear()}>Clear</Button>
+            </Box>
 
             {registrationError && (
               <Alert severity="error" onClose={() => setRegistrationError(null)}>
@@ -197,20 +92,7 @@ export default function SignUpView() {
               </Alert>
             )}
 
-            <Stepper activeStep={currentStep} alternativeLabel>
-              {_.map(REGISTRATION_STEPS, (label: string) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-
-            <RegistrationForm
-              activeStep={currentStep}
-              onBack={goToPreviousStep}
-              onSubmit={handleStepSubmit}
-              formData={formData}
-            />
+            <SimplifiedRegistrationForm onSubmit={handleSubmit} formData={formData} />
           </Stack>
         </CardContent>
       </Card>

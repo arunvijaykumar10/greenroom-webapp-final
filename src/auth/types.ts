@@ -41,14 +41,15 @@ export type CompanyInformation = {
 
 export type UserInformation = {
   first_name: string;
+  middle_name?: string;
   last_name: string;
   email_address: string;
   role_title: string;
 };
 
 export type PayrollDetails = {
-  pay_frequency: 'weekly' | 'bi-weekly';
-  pay_period: 'same week' | 'in arrears';
+  pay_frequency: string;
+  pay_period: string;
   payroll_start_date: string;
   check_number: number;
 };
