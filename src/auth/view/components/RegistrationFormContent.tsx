@@ -8,7 +8,13 @@ import { Box, Stack, Alert, Divider, IconButton, Typography, InputAdornment } fr
 import { EmailInboxIcon } from 'src/assets/icons';
 
 import { Iconify } from 'src/components/iconify';
-import { Field, RHFCheckbox, RHFTextField, RHFDatePicker, RHFAutocomplete } from 'src/components/hook-form';
+import {
+  Field,
+  RHFCheckbox,
+  RHFTextField,
+  RHFDatePicker,
+  RHFAutocomplete,
+} from 'src/components/hook-form';
 
 import { StepIndex } from 'src/auth/types';
 import { FormHead } from 'src/auth/components/form-head';
@@ -28,6 +34,7 @@ interface RegistrationFormContentProps {
   setIsOtpVerified: React.Dispatch<React.SetStateAction<boolean>>;
   isOtpVerified: boolean;
   formData?: any;
+  onSubmit: (data: any) => Promise<void>;
 }
 
 const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
@@ -37,13 +44,14 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
   setIsOtpVerified,
   isOtpVerified,
   formData,
+  onSubmit,
 }) => {
   const showPassword = useBoolean();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState({
     terms: false,
     privacy: false,
-    dataProcessing: false
+    dataProcessing: false,
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const methods = useFormContext();
@@ -63,10 +71,10 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
       });
 
       setIsUserVerified(true);
-
     } catch (error) {
       console.error('Error signing up user:', error);
-      const errorMsg = error instanceof Error ? error.message : 'Failed to create account. Please try again.';
+      const errorMsg =
+        error instanceof Error ? error.message : 'Failed to create account. Please try again.';
 
       // Check for common Cognito errors
       if (errorMsg.includes('already exists')) {
@@ -74,7 +82,7 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
       } else if (errorMsg.includes('password') || errorMsg.includes('Password')) {
         methods.setError('password', {
           type: 'manual',
-          message: errorMsg
+          message: errorMsg,
         });
       } else {
         setErrorMessage(errorMsg);
@@ -96,6 +104,7 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
         username: email,
         confirmationCode: formValues.code,
       });
+      await onSubmit(formValues);
 
       setIsOtpVerified(true);
       sessionStorage.setItem('otpVerified', 'true');
@@ -104,7 +113,8 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
       methods.clearErrors('code');
     } catch (error) {
       console.error('Error verifying OTP:', error);
-      const errorMsg = error instanceof Error ? error.message : 'Invalid verification code. Please try again.';
+      const errorMsg =
+        error instanceof Error ? error.message : 'Invalid verification code. Please try again.';
 
       // Check for specific OTP errors
       if (errorMsg.includes('expired')) {
@@ -112,12 +122,12 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
       } else if (errorMsg.includes('not found') || errorMsg.includes('Invalid verification')) {
         methods.setError('code', {
           type: 'manual',
-          message: 'Invalid verification code. Please check and try again.'
+          message: 'Invalid verification code. Please check and try again.',
         });
       } else {
         methods.setError('code', {
           type: 'manual',
-          message: errorMsg
+          message: errorMsg,
         });
       }
     } finally {
@@ -128,59 +138,21 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
   const handleTermsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTermsAccepted({
       ...termsAccepted,
-      [event.target.name]: event.target.checked
+      [event.target.name]: event.target.checked,
     });
   };
 
   const renderCompanyInfoStep = () => (
     <Stack spacing={2}>
-      <Typography variant="subtitle1">Company Information</Typography>
-      <RHFTextField
-        name="entity_name"
-        label="Entity Name *"
-        inputProps={{ maxLength: 64 }}
-      />
-      <RHFAutocomplete
-        options={ENTITY_TYPES}
-        name="entity_type"
-        label="Entity Type *"
-      />
-      <RHFTextField
-        name="fein"
-        label="FEIN"
-        placeholder="99-9999999"
-      />
-      <RHFTextField
-        name="address_line_1"
-        label="Address Line 1"
-        inputProps={{ maxLength: 64 }}
-      />
-      <RHFTextField
-        name="address_line_2"
-        label="Address Line 2"
-        inputProps={{ maxLength: 64 }}
-      />
-      <RHFTextField
-        name="city"
-        label="City"
-        inputProps={{ maxLength: 24 }}
-      />
-      <RHFAutocomplete
-        options={STATES}
-        name="state"
-        label="State"
-        defaultValue="NY"
-      />
-      <RHFTextField
-        name="zip_code"
-        label="Zip Code"
-        placeholder="12345"
-      />
-      <RHFTextField
-        name="phone_number"
-        label="Phone Number"
-        placeholder="(999)-999-9999"
-      />
+      <RHFTextField name="entity_name" label="Entity Name *" inputProps={{ maxLength: 64 }} />
+      <RHFAutocomplete options={ENTITY_TYPES} name="entity_type" label="Entity Type *" />
+      <RHFTextField name="fein" label="FEIN" placeholder="99-9999999" />
+      <RHFTextField name="address_line_1" label="Address Line 1" inputProps={{ maxLength: 64 }} />
+      <RHFTextField name="address_line_2" label="Address Line 2" inputProps={{ maxLength: 64 }} />
+      <RHFTextField name="city" label="City" inputProps={{ maxLength: 24 }} />
+      <RHFAutocomplete options={STATES} name="state" label="State" defaultValue="NY" />
+      <RHFTextField name="zip_code" label="Zip Code" placeholder="12345" />
+      <RHFTextField name="phone_number" label="Phone Number" placeholder="(999)-999-9999" />
       <RHFTextField
         name="nys_unemployment_registration_number"
         label="NYS Unemployment Registration Number"
@@ -191,61 +163,53 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
 
   const renderUserInfoStep = () => (
     <Stack spacing={3}>
-      <Typography variant="subtitle1">Administrator Information</Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: { xs: 3, sm: 2 },
-          flexDirection: { xs: 'column', sm: 'row' },
-        }}
-      >
-        <Field.Text
-          name="first_name"
-          label="First name *"
-        />
-        <Field.Text
-          name="middle_name"
-          label="Middle name"
-        />
+      {!isUserVerified && (
+        <>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: { xs: 3, sm: 2 },
+              flexDirection: { xs: 'column', sm: 'row' },
+            }}
+          >
+            <Field.Text name="first_name" label="First name *" />
+            <Field.Text name="middle_name" label="Middle name" />
 
-        <Field.Text
-          name="last_name"
-          label="Last name *"
-        />
-      </Box>
+            <Field.Text name="last_name" label="Last name *" />
+          </Box>
 
-      <Field.Text
-        name="email_address"
-        label="Email address *"
-        error={!!methods.formState.errors.email_address}
-        helperText={methods.formState.errors.email_address?.message?.toString()}
-      />
+          <Field.Text
+            name="email_address"
+            label="Email address *"
+            error={!!methods.formState.errors.email_address}
+            helperText={methods.formState.errors.email_address?.message?.toString()}
+          />
 
-      <RHFAutocomplete
-        options={ROLES}
-        name="role_title"
-        label="Role / Title"
-      />
+          <RHFAutocomplete options={ROLES} name="role_title" label="Role / Title" />
 
-      <Field.Text
-        name="password"
-        label="Password *"
-        required
-        placeholder="6+ characters"
-        type={showPassword.value ? 'text' : 'password'}
-        slotProps={{
-          inputLabel: { shrink: true },
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={showPassword.onToggle} edge="end">
-                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+          <Field.Text
+            name="password"
+            label="Password *"
+            required
+            placeholder="6+ characters"
+            type={showPassword.value ? 'text' : 'password'}
+            slotProps={{
+              inputLabel: { shrink: true },
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={showPassword.onToggle} edge="end">
+                      <Iconify
+                        icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
+                      />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </>
+      )}
 
       {!isUserVerified && (
         <>
@@ -275,9 +239,7 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
             title="Please check your email!"
             description={`We've emailed a 6-digit confirmation code to ${sessionStorage.getItem('userEmail') || methods.getValues().email_address}. \nPlease enter the code in the box below to verify your email.`}
           />
-          <Field.Code
-            name="code"
-          />
+          <Field.Code name="code" />
 
           <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
             <LoadingButton
@@ -285,7 +247,8 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
               size="large"
               variant="outlined"
               onClick={() => {
-                const email = sessionStorage.getItem('userEmail') || methods.getValues().email_address;
+                const email =
+                  sessionStorage.getItem('userEmail') || methods.getValues().email_address;
                 import('src/auth/context').then(({ resendSignUpCode }) => {
                   resendSignUpCode({ username: email });
                 });
@@ -313,7 +276,6 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
 
   const renderPayrollStep = () => (
     <Stack spacing={2}>
-      <Typography variant="subtitle1">Payroll Information</Typography>
       <RHFAutocomplete
         name="pay_frequency"
         label="Pay Frequency"
@@ -327,10 +289,7 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
         options={PAY_PERIODS}
         helperText="The indication of the period being paid"
       />
-      <RHFDatePicker
-        name="payroll_start_date"
-        label="Payroll Start Date"
-      />
+      <RHFDatePicker name="payroll_start_date" label="Payroll Start Date" />
       <RHFTextField
         name="check_number"
         label="Check Number"
@@ -348,78 +307,134 @@ const RegistrationFormContent: React.FC<RegistrationFormContentProps> = ({
 
     return (
       <Stack spacing={3}>
-        <Typography variant="h6">Registration Summary</Typography>
-
         <Box>
-          <Typography variant="subtitle1" gutterBottom>Company Information</Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            Company Information
+          </Typography>
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={1}>
-            <Typography variant="body2"><strong>Entity Name:</strong> {companyInfo?.entity_name}</Typography>
-            <Typography variant="body2"><strong>Entity Type:</strong> {companyInfo?.entity_type}</Typography>
-            {companyInfo?.fein && <Typography variant="body2"><strong>FEIN:</strong> {companyInfo.fein}</Typography>}
+            <Typography variant="body2">
+              <strong>Entity Name:</strong> {companyInfo?.entity_name}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Entity Type:</strong> {companyInfo?.entity_type}
+            </Typography>
+            {companyInfo?.fein && (
+              <Typography variant="body2">
+                <strong>FEIN:</strong> {companyInfo.fein}
+              </Typography>
+            )}
 
             {companyInfo?.address_line_1 && (
               <>
-                <Typography variant="body2"><strong>Address:</strong></Typography>
+                <Typography variant="body2">
+                  <strong>Address:</strong>
+                </Typography>
                 <Typography variant="body2">{companyInfo.address_line_1}</Typography>
-                {companyInfo?.address_line_2 && <Typography variant="body2">{companyInfo.address_line_2}</Typography>}
-                <Typography variant="body2">{companyInfo?.city}, {companyInfo?.state} {companyInfo?.zip_code}</Typography>
+                {companyInfo?.address_line_2 && (
+                  <Typography variant="body2">{companyInfo.address_line_2}</Typography>
+                )}
+                <Typography variant="body2">
+                  {companyInfo?.city}, {companyInfo?.state} {companyInfo?.zip_code}
+                </Typography>
               </>
             )}
 
-            {companyInfo?.phone_number && <Typography variant="body2"><strong>Phone:</strong> {companyInfo.phone_number}</Typography>}
+            {companyInfo?.phone_number && (
+              <Typography variant="body2">
+                <strong>Phone:</strong> {companyInfo.phone_number}
+              </Typography>
+            )}
             {companyInfo?.nys_unemployment_registration_number && (
               <Typography variant="body2">
-                <strong>NYS Unemployment Registration:</strong> {companyInfo.nys_unemployment_registration_number}
+                <strong>NYS Unemployment Registration:</strong>{' '}
+                {companyInfo.nys_unemployment_registration_number}
               </Typography>
             )}
           </Stack>
         </Box>
 
         <Box>
-          <Typography variant="subtitle1" gutterBottom>Administrator Information</Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            Administrator Information
+          </Typography>
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={1}>
             <Typography variant="body2">
               <strong>Name:</strong> {userInfo?.first_name} {userInfo?.last_name}
             </Typography>
-            <Typography variant="body2"><strong>Email:</strong> {userInfo?.email_address}</Typography>
-            {userInfo?.role_title && <Typography variant="body2"><strong>Role:</strong> {userInfo.role_title}</Typography>}
+            <Typography variant="body2">
+              <strong>Email:</strong> {userInfo?.email_address}
+            </Typography>
+            {userInfo?.role_title && (
+              <Typography variant="body2">
+                <strong>Role:</strong> {userInfo.role_title}
+              </Typography>
+            )}
           </Stack>
         </Box>
 
         <Box>
-          <Typography variant="subtitle1" gutterBottom>Payroll Information</Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            Payroll Information
+          </Typography>
           <Divider sx={{ mb: 2 }} />
           <Stack spacing={1}>
-            <Typography variant="body2"><strong>Pay Frequency:</strong> {payrollInfo?.pay_frequency}</Typography>
-            <Typography variant="body2"><strong>Pay Period:</strong> {payrollInfo?.pay_period}</Typography>
             <Typography variant="body2">
-              <strong>Payroll Start Date:</strong> {new Date(payrollInfo?.payroll_start_date).toLocaleDateString()}
+              <strong>Pay Frequency:</strong> {payrollInfo?.pay_frequency}
             </Typography>
-            <Typography variant="body2"><strong>Check Number:</strong> {payrollInfo?.check_number}</Typography>
+            <Typography variant="body2">
+              <strong>Pay Period:</strong> {payrollInfo?.pay_period}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Payroll Start Date:</strong>{' '}
+              {new Date(payrollInfo?.payroll_start_date).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Check Number:</strong> {payrollInfo?.check_number}
+            </Typography>
           </Stack>
         </Box>
 
         <Box sx={{ mt: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>Terms and Agreements</Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            Terms and Agreements
+          </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          <RHFCheckbox name='terms_service' label={
-            <Typography variant="body2">
-              I agree to the <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>Terms of Service</Typography>
-            </Typography>
-          } />
-          <RHFCheckbox name='privacy_policy' label={
-            <Typography variant="body2">
-              I agree to the <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>Privacy Policy</Typography>
-            </Typography>
-          } />
-          <RHFCheckbox name='data_processing_agreement' label={
-            <Typography variant="body2">
-              I consent to the <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>Data Processing Agreement</Typography>
-            </Typography>
-          } />
+          <RHFCheckbox
+            name="terms_service"
+            label={
+              <Typography variant="body2">
+                I agree to the{' '}
+                <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>
+                  Terms of Service
+                </Typography>
+              </Typography>
+            }
+          />
+          <RHFCheckbox
+            name="privacy_policy"
+            label={
+              <Typography variant="body2">
+                I agree to the{' '}
+                <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>
+                  Privacy Policy
+                </Typography>
+              </Typography>
+            }
+          />
+          <RHFCheckbox
+            name="data_processing_agreement"
+            label={
+              <Typography variant="body2">
+                I consent to the{' '}
+                <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>
+                  Data Processing Agreement
+                </Typography>
+              </Typography>
+            }
+          />
         </Box>
       </Stack>
     );

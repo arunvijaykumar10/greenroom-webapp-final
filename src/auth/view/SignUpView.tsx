@@ -1,7 +1,17 @@
 import _ from 'lodash';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Step, Card, Stack, Alert, Stepper, StepLabel, Typography, CardContent } from '@mui/material';
+import {
+  Box,
+  Step,
+  Card,
+  Stack,
+  Alert,
+  Stepper,
+  StepLabel,
+  Typography,
+  CardContent,
+} from '@mui/material';
 
 import { useRouter } from 'src/routes/hooks';
 
@@ -11,16 +21,41 @@ import { StepIndex } from '../types';
 import { useRegisterMutation } from '../api';
 import { RegistrationForm } from './components';
 
-import type { PayrollDetails, UserInformation, CompanyInformation, RegistrationFormData } from '../types';
+import type {
+  PayrollDetails,
+  UserInformation,
+  CompanyInformation,
+  RegistrationFormData,
+} from '../types';
 
-const REGISTRATION_STEPS = ['Company Information', 'User Details', 'Payroll Details', 'Review & Submit'];
+const REGISTRATION_STEPS = [
+  'Company Information',
+  'User Details',
+  'Payroll Details',
+  'Review & Submit',
+];
+const STORAGE_KEY = 'registration_data';
 
 export default function SignUpView() {
-  const [currentStep, setCurrentStep] = useState<StepIndex>(StepIndex.CompanyInfo);
-  const [formData, setFormData] = useState<Partial<RegistrationFormData>>({});
+  const [currentStep, setCurrentStep] = useState<StepIndex>(() => {
+    const savedStep = localStorage.getItem('registration_step');
+    return savedStep ? parseInt(savedStep, 10) : StepIndex.CompanyInfo;
+  });
+
+  const [formData, setFormData] = useState<Partial<RegistrationFormData>>(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    return savedData ? JSON.parse(savedData) : {};
+  });
+
   const [registrationComplete, setRegistrationComplete] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
-  const [register] = useRegisterMutation()
+  const [register] = useRegisterMutation();
+
+  // Save to localStorage whenever formData or currentStep changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+    localStorage.setItem('registration_step', currentStep.toString());
+  }, [formData, currentStep]);
 
   const router = useRouter();
 
@@ -32,7 +67,6 @@ export default function SignUpView() {
 
   const handleStepSubmit = useCallback(
     async (stepData: any) => {
-      console.log('formData', currentStep);
       try {
         switch (currentStep) {
           case StepIndex.CompanyInfo:
@@ -49,7 +83,7 @@ export default function SignUpView() {
                 zip_code: stepData.zip_code,
                 phone_number: stepData.phone_number,
                 nys_unemployment_registration_number: stepData.nys_unemployment_registration_number,
-              } as CompanyInformation
+              } as CompanyInformation,
             }));
             goToNextStep();
             break;
@@ -62,7 +96,7 @@ export default function SignUpView() {
                 last_name: stepData.last_name,
                 email_address: stepData.email_address,
                 role_title: stepData.role_title,
-              } as UserInformation
+              } as UserInformation,
             }));
             goToNextStep();
             break;
@@ -75,14 +109,19 @@ export default function SignUpView() {
                 pay_period: stepData.pay_period,
                 payroll_start_date: stepData.payroll_start_date,
                 check_number: parseInt(stepData.check_number, 10) || 1,
-              } as PayrollDetails
+              } as PayrollDetails,
             }));
             goToNextStep();
             break;
 
           case StepIndex.Summary:
             if (formData.companyInfo && formData.userInfo && formData.payrollInfo) {
-              register(formData)
+              register(formData);
+              localStorage.removeItem(STORAGE_KEY);
+              localStorage.removeItem('registration_step');
+              localStorage.removeItem('registration_user_verified');
+              localStorage.removeItem('registration_otp_verified');
+              localStorage.removeItem('registration_form_values');
             }
             break;
 
@@ -91,7 +130,9 @@ export default function SignUpView() {
         }
       } catch (error) {
         console.error('Registration error:', error);
-        setRegistrationError(error instanceof Error ? error.message : 'An error occurred during registration');
+        setRegistrationError(
+          error instanceof Error ? error.message : 'An error occurred during registration'
+        );
       }
     },
     [currentStep, formData, router]
@@ -106,10 +147,10 @@ export default function SignUpView() {
           justifyContent: 'center',
           alignItems: 'center',
           bgcolor: 'background.default',
-          py: 5
+          py: 5,
         }}
       >
-        <Card sx={{ width: '100%', maxWidth: 700 }}>
+        <Card sx={{ width: '100%', maxWidth: 800 }}>
           <CardContent>
             <Stack spacing={4} alignItems="center">
               <Typography variant="h5" textAlign="center">
@@ -134,14 +175,20 @@ export default function SignUpView() {
         justifyContent: 'center',
         alignItems: 'center',
         bgcolor: 'background.default',
-        py: 5
+        py: 5,
       }}
     >
-      <Card sx={{ width: '100%', maxWidth: 700 }}>
+      <Card sx={{ width: '100%', maxWidth: 800 }}>
         <CardContent>
           <Stack spacing={4}>
-            <Typography variant="h5" textAlign="center">
-              Register
+            <Typography
+              variant="h4"
+              textAlign="center"
+              fontWeight='bold'
+              color="primary"
+              gutterBottom
+            >
+              Registration
             </Typography>
 
             {registrationError && (
