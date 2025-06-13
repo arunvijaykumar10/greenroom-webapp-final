@@ -2,6 +2,11 @@ const ROOTS = {
   AUTH: '/auth',
   AUTH_DEMO: '/auth-demo',
   DASHBOARD: '/dashboard',
+  COMPANY: '/company',
+  PAYROLL: '/payroll',
+  TAXES: '/taxes',
+  REPORTS: '/reports',
+  SETTINGS: '/settings',
 };
 
 // ----------------------------------------------------------------------
@@ -21,5 +26,12 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
+    dashboard: `${ROOTS.DASHBOARD}/dashboard`,
+    company: `${ROOTS.DASHBOARD}/company`,
+    payroll: `${ROOTS.DASHBOARD}/payroll`,
+    taxes: `${ROOTS.DASHBOARD}/taxes`,
+    reports: `${ROOTS.DASHBOARD}/reports`,
+    settings: `${ROOTS.DASHBOARD}/settings`,
+    payees: `${ROOTS.DASHBOARD}/payees`,
   },
 };

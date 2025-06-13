@@ -44,13 +44,17 @@ const ICONS = {
 // ----------------------------------------------------------------------
 
 export const navData: NavSectionProps['data'] = [
-  /**
-   * Overview
-   */
+
   {
     subheader: 'Overview',
     items: [
-      { title: 'App', path: paths.dashboard.root, icon: ICONS.dashboard },
+      { title: 'Company', path: paths.dashboard.root, icon: ICONS.banking },
+      {title:'Dashboard', path: paths.dashboard.dashboard, icon: ICONS.dashboard },
+      { title: 'Payees', path: paths.dashboard.payees, icon: ICONS.user },
+      { title: 'Payroll', path: paths.dashboard.payroll, icon: ICONS.ecommerce },
+      { title: 'Taxes', path: paths.dashboard.taxes, icon: ICONS.parameter },
+      { title: 'Reports', path: paths.dashboard.reports, icon: ICONS.analytics },
+      { title: 'Settings', path: paths.dashboard.settings, icon: ICONS.external },
     ],
   },
  ];

@@ -30,7 +30,7 @@ export default function SignUpView() {
     async (formValues: any) => {
       try {
         const registrationData = {
-          companyInfo: {
+          organization: {
             name: formValues.entity_name,
             organization_type: formValues.entity_type,
           },
