@@ -38,6 +38,8 @@ export default function SignUpView() {
             first_name: formValues.first_name,
             last_name: formValues.last_name,
             email: formValues.email_address,
+            entity_name: formValues.entity_name,
+            entity_type: formValues.entity_type,
           },
         };
 

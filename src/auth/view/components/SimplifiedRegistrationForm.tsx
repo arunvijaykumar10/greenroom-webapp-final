@@ -114,6 +114,8 @@ export const SimplifiedRegistrationForm = ({ onSubmit, formData }: FormProps) =>
         firstName: formValues.first_name,
         lastName: formValues.last_name,
         middleName: formValues.middle_name,
+        companyName: formValues.entity_name,
+        companyType: formValues.entity_type,
       });
 
       setIsUserVerified(true);

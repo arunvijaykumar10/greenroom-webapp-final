@@ -21,7 +21,13 @@ import {
 
 export type SignInParams = SignInInput;
 
-export type SignUpParams = SignUpInput & { firstName: string; lastName: string, middleName?: string };
+export type SignUpParams = SignUpInput & { 
+  firstName: string; 
+  lastName: string;
+  middleName?: string;
+  companyName?: string;
+  companyType?: string;
+};
 
 export type ResendSignUpCodeParams = ResendSignUpCodeInput;
 
@@ -47,11 +53,22 @@ export const signUp = async ({
   firstName,
   lastName,
   middleName = '',
+  companyName = '',
+  companyType = '',
 }: SignUpParams): Promise<void> => {
   await _signUp({
     username,
     password,
-    options: { userAttributes: { email: username, given_name: firstName, family_name: lastName, middle_name: middleName } },
+    options: { 
+      userAttributes: { 
+        email: username, 
+        given_name: firstName, 
+        family_name: lastName, 
+        middle_name: middleName,
+        'custom:company_name': companyName,
+        'custom:company_type': companyType
+      }
+    },
   });
 };
 
