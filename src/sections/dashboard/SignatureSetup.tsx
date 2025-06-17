@@ -11,11 +11,11 @@ import {
   Typography,
   RadioGroup,
   FormControl,
-  FormControlLabel
+  FormControlLabel,
 } from '@mui/material';
 
 import { useDispatch, useSelector } from 'src/redux/store';
-import { saveSignatureSetup } from 'src/redux/slices/formData';
+import { saveSignatureSetup } from 'src/redux/slice/formData';
 
 import type { SignaturePolicy, SignatureMethod, SignatureSetupData } from './types';
 

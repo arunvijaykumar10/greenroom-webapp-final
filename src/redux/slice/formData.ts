@@ -1,10 +1,5 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { 
-  BankSetupData, 
-  CompanyFormData, 
-  SignatureSetupData, 
-  UnionConfigurationData 
-} from 'src/pages/dashboard/types';
+import type { BankSetupData, CompanyFormData, SignatureSetupData, UnionConfigurationData } from 'src/sections/dashboard/types';
 
 import { createSlice } from '@reduxjs/toolkit';
 
@@ -47,13 +42,13 @@ const formDataSlice = createSlice({
   },
 });
 
-export const { 
-  saveCompanyInformation, 
-  saveUnionConfiguration, 
-  saveBankSetup, 
-  saveSignatureSetup, 
+export const {
+  saveCompanyInformation,
+  saveUnionConfiguration,
+  saveBankSetup,
+  saveSignatureSetup,
   savePayrollAndTaxes,
-  resetFormData 
+  resetFormData
 } = formDataSlice.actions;
 
 export default formDataSlice.reducer;

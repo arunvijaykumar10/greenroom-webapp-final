@@ -1,8 +1,10 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+
+import { apiBaseQuery } from 'src/redux/apiBaseQuery';
 
 const api = createApi({
     reducerPath: 'auth_api',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3000' }),
+    baseQuery: apiBaseQuery(),
     endpoints: (builder) => ({
         register: builder.mutation<any, any>({
             query: (body) => ({
@@ -10,9 +12,15 @@ const api = createApi({
                 method: 'POST',
                 body,
             }),
+        }),
+        profile: builder.query<any, void>({
+            query: () => ({
+                url: '/me',
+                method: 'GET',
+            }),
         })
     }),
 });
 
 export default api;
-export const { useRegisterMutation } = api;
+export const { useRegisterMutation, useProfileQuery } = api;

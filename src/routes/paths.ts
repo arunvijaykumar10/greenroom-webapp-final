@@ -1,12 +1,5 @@
 const ROOTS = {
   AUTH: '/auth',
-  AUTH_DEMO: '/auth-demo',
-  DASHBOARD: '/dashboard',
-  COMPANY: '/company',
-  PAYROLL: '/payroll',
-  TAXES: '/taxes',
-  REPORTS: '/reports',
-  SETTINGS: '/settings',
 };
 
 // ----------------------------------------------------------------------
@@ -24,14 +17,14 @@ export const paths = {
     resetPassword: `${ROOTS.AUTH}/reset-password`,
   },
   // DASHBOARD
-  dashboard: {
-    root: ROOTS.COMPANY,
-    dashboard: `${ROOTS.DASHBOARD}/dashboard`,
-    company: `${ROOTS.DASHBOARD}/company`,
-    payroll: `${ROOTS.DASHBOARD}/payroll`,
-    taxes: `${ROOTS.DASHBOARD}/taxes`,
-    reports: `${ROOTS.DASHBOARD}/reports`,
-    settings: `${ROOTS.DASHBOARD}/settings`,
-    payees: `${ROOTS.DASHBOARD}/payees`,
+  app: {
+    root: `/dashboard`,
+    dashboard: `/dashboard`,
+    company: `/company`,
+    payroll: `/payroll`,
+    taxes: `/taxes`,
+    reports: `/reports`,
+    settings: `/settings`,
+    payees: `/payees`,
   },
 };

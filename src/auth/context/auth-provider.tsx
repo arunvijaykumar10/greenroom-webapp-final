@@ -1,14 +1,16 @@
+import _ from 'lodash';
 import { Amplify } from 'aws-amplify';
 import { useSetState } from 'minimal-shared/hooks';
 import { useMemo, useEffect, useCallback } from 'react';
 import { fetchAuthSession, fetchUserAttributes } from 'aws-amplify/auth';
 
-import axios from 'src/lib/axios';
 import { CONFIG } from 'src/global-config';
+import { dispatch } from 'src/redux/store';
+import { setUser, setToken } from 'src/redux/slice/auth';
 
+import { useProfileQuery } from '../api';
 import { AuthContext } from './auth-context';
 
-import type { AuthState } from './../types';
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +41,13 @@ type Props = {
 };
 
 export function AuthProvider({ children }: Props) {
-  const { state, setState } = useSetState<AuthState>({ user: null, loading: true });
+  const { state, setState } = useSetState<any>({ user: null, loading: true });
+
+  const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
+
+  const status = state.loading ? 'loading' : checkAuthenticated;
+  const { data: userDetails } = useProfileQuery(undefined, { skip: status !== 'authenticated' || !state.user });
+
 
   const checkUserSession = useCallback(async () => {
     try {
@@ -50,11 +58,11 @@ export function AuthProvider({ children }: Props) {
 
         const accessToken = authSession.accessToken.toString();
 
+        dispatch(setToken(accessToken));
+
         setState({ user: { ...authSession, ...userAttributes }, loading: false });
-        axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
       } else {
         setState({ user: null, loading: false });
-        delete axios.defaults.headers.common.Authorization;
       }
     } catch (error) {
       console.error(error);
@@ -67,22 +75,34 @@ export function AuthProvider({ children }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (state.user && !_.isEmpty(userDetails)) {
+      setState((prevState: any) => ({
+        user: {
+          ...prevState.user,
+          ...userDetails,
+        },
+      }));
+
+      dispatch(setUser(userDetails));
+
+    }
+  }, []);
+
   // ----------------------------------------------------------------------
 
-  const checkAuthenticated = state.user ? 'authenticated' : 'unauthenticated';
 
-  const status = state.loading ? 'loading' : checkAuthenticated;
 
   const memoizedValue = useMemo(
     () => ({
       user: state.user
         ? {
-            ...state.user,
-            id: state.user?.sub,
-            accessToken: state.user?.accessToken?.toString(),
-            displayName: `${state.user?.given_name} ${state.user?.family_name}`,
-            role: state.user?.role ?? 'admin',
-          }
+          ...state.user,
+          id: state.user?.sub,
+          accessToken: state.user?.accessToken?.toString(),
+          displayName: `${state.user?.given_name} ${state.user?.family_name}`,
+          role: state.user?.role ?? 'admin',
+        }
         : null,
       checkUserSession,
       loading: status === 'loading',

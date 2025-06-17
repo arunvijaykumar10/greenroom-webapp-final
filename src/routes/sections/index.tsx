@@ -5,7 +5,7 @@ import { Navigate as RouterNavigate } from 'react-router';
 
 import { authRoutes } from './auth';
 import { mainRoutes } from './main';
-import { dashboardRoutes } from './company';
+import { dashboardRoutes } from './dashboard';
 
 // ----------------------------------------------------------------------
 

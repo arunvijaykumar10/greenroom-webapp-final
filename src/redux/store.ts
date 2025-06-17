@@ -5,14 +5,15 @@ import type {
 import _ from 'lodash';
 import storage from 'redux-persist/lib/storage';
 import { persistStore, persistReducer } from 'redux-persist';
-import { configureStore , combineReducers } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
     useDispatch as useAppDispatch,
     useSelector as useAppSelector,
 } from 'react-redux';
 
 import api from './api';
-import formDataReducer from './slices/formData';
+import authSlice from './slice/auth'
+import formDataReducer from './slice/formData';
 
 // ----------------------------------------------------------------------
 const rootPersistConfig = {
@@ -27,6 +28,15 @@ const apiReducers = _.reduce(api, (acc, val) => ({ ...acc, [val.reducerPath]: va
 const rootReducer = combineReducers({
     ...apiReducers,
     formData: formDataReducer,
+    auth: persistReducer(
+        {
+            key: 'auth',
+            storage,
+            keyPrefix: 'redux-',
+            whitelist: ['token', 'account'],
+        },
+        authSlice
+    ),
 });
 
 const apiMiddlewares = _.map(api, 'middleware');

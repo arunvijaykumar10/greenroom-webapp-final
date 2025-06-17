@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import { useDispatch, useSelector } from 'src/redux/store';
-import { saveCompanyInformation } from 'src/redux/slices/formData';
+import { saveCompanyInformation } from 'src/redux/slice/formData';
 
 import { RHFTextField, RHFAutocomplete } from 'src/components/hook-form';
 

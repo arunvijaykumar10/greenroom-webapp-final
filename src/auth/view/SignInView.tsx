@@ -69,7 +69,6 @@ export default function SignInView() {
     try {
       await signInWithPassword({ username: data.email, password: data.password });
       await checkUserSession?.();
-
       router.refresh();
     } catch (error) {
       console.error(error);

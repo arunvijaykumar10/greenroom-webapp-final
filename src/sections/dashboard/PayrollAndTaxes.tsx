@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 
 import { useDispatch, useSelector } from 'src/redux/store';
-import { savePayrollAndTaxes } from 'src/redux/slices/formData';
+import { savePayrollAndTaxes } from 'src/redux/slice/formData';
 
 import { RHFSelect, RHFTextField } from 'src/components/hook-form';
 

@@ -6,13 +6,9 @@ import Grid from '@mui/material/Grid2';
 import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/routes/components';
-
-import { _socials } from 'src/_mock';
-import { TwitterIcon, FacebookIcon, LinkedinIcon, InstagramIcon } from 'src/assets/icons';
 
 import { Logo } from 'src/components/logo';
 
@@ -79,25 +75,6 @@ export function Footer({
               The starting point for your next project with Minimal UI Kit, built on the newest
               version of Material-UI ©, ready to be customized to your style.
             </Typography>
-
-            <Box
-              sx={(theme) => ({
-                mt: 3,
-                mb: 5,
-                display: 'flex',
-                justifyContent: 'center',
-                [theme.breakpoints.up(layoutQuery)]: { mb: 0, justifyContent: 'flex-start' },
-              })}
-            >
-              {_socials.map((social) => (
-                <IconButton key={social.label}>
-                  {social.value === 'twitter' && <TwitterIcon />}
-                  {social.value === 'facebook' && <FacebookIcon />}
-                  {social.value === 'instagram' && <InstagramIcon />}
-                  {social.value === 'linkedin' && <LinkedinIcon />}
-                </IconButton>
-              ))}
-            </Box>
           </Grid>
 
           <Grid size={{ xs: 12, [layoutQuery]: 6 }}>

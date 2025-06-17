@@ -16,7 +16,7 @@ import {
   stepConnectorClasses
 } from "@mui/material";
 
-import { resetFormData } from 'src/redux/slices/formData';
+import { resetFormData } from 'src/redux/slice/formData';
 import { useDispatch, useSelector } from 'src/redux/store';
 
 import BankSetup from './BankSetup';

@@ -36,10 +36,17 @@ const dashboardLayout = () => (
 
 export const dashboardRoutes: RouteObject[] = [
   {
-    path: 'dashboard',
+    path: '/',
     element: CONFIG.auth.skip ? dashboardLayout() : <AuthGuard>{dashboardLayout()}</AuthGuard>,
     children: [
       { index: true, element: <IndexPage /> },
+      { path: 'dashboard', element: <IndexPage /> },
+      { path: 'company', element: <IndexPage /> },
+      { path: 'payees', element: <IndexPage /> },
+      { path: 'payroll', element: <IndexPage /> },
+      { path: 'taxes', element: <IndexPage /> },
+      { path: 'reports', element: <IndexPage /> },
+      { path: 'settings', element: <IndexPage /> },
     ],
   },
 ];

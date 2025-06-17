@@ -7,9 +7,16 @@ import { useRouter } from 'src/routes/hooks';
 import { toast } from 'src/components/snackbar';
 
 import { useRegisterMutation } from '../api';
-import { SimplifiedRegistrationForm } from './components/SimplifiedRegistrationForm';
+import { SimplifiedRegistrationForm } from './components';
 
 const STORAGE_KEY = 'registration_data';
+
+const removeLocalStorageItems = () => {
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem('registration_form_values');
+  localStorage.removeItem('registration_user_verified');
+  localStorage.removeItem('registration_otp_verified');
+};
 
 export default function SignUpView() {
   const [formData, setFormData] = useState<any>(() => {
@@ -30,16 +37,14 @@ export default function SignUpView() {
     async (formValues: any) => {
       try {
         const registrationData = {
-          organization: {
+          company: {
             name: formValues.entity_name,
-            organization_type: formValues.entity_type,
+            company_type: formValues.entity_type,
           },
           user_profile: {
             first_name: formValues.first_name,
             last_name: formValues.last_name,
             email: formValues.email_address,
-            entity_name: formValues.entity_name,
-            entity_type: formValues.entity_type,
           },
         };
 
@@ -57,12 +62,7 @@ export default function SignUpView() {
 
   useEffect(() => {
     if (registrationResult.isSuccess) {
-      // Clear localStorage after successful registration
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem('registration_form_values');
-      localStorage.removeItem('registration_user_verified');
-      localStorage.removeItem('registration_otp_verified');
-
+      removeLocalStorageItems();
       toast.success('Registration successful! Please sign in.');
 
       router.push('/auth/sign-in');

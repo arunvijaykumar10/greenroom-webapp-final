@@ -10,7 +10,7 @@ import {
   Button
 } from '@mui/material';
 
-import { saveBankSetup } from 'src/redux/slices/formData';
+import { saveBankSetup } from 'src/redux/slice/formData';
 import { useDispatch, useSelector } from 'src/redux/store';
 
 import { RHFSelect, RHFCheckbox, RHFTextField } from 'src/components/hook-form';

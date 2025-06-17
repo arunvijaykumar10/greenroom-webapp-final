@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/global-config';
 
-import Dashboard from './Dashboard';
+import Dashboard from '../../sections/dashboard/Dashboard';
 
 // ----------------------------------------------------------------------
 

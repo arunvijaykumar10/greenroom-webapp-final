@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 
 import { useDispatch, useSelector } from 'src/redux/store';
-import { saveUnionConfiguration } from 'src/redux/slices/formData';
+import { saveUnionConfiguration } from 'src/redux/slice/formData';
 
 import { RHFTextField, RHFRadioGroup, RHFAutocomplete } from 'src/components/hook-form';
 
