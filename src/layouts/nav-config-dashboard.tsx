@@ -2,59 +2,37 @@ import type { NavSectionProps } from 'src/components/nav-section';
 
 import { paths } from 'src/routes/paths';
 
-import { CONFIG } from 'src/global-config';
-
-import { SvgColor } from 'src/components/svg-color';
-
-// ----------------------------------------------------------------------
-
-const icon = (name: string) => (
-  <SvgColor src={`${CONFIG.assetsDir}/assets/icons/navbar/${name}.svg`} />
-);
-
-const ICONS = {
-  job: icon('ic-job'),
-  blog: icon('ic-blog'),
-  chat: icon('ic-chat'),
-  mail: icon('ic-mail'),
-  user: icon('ic-user'),
-  file: icon('ic-file'),
-  lock: icon('ic-lock'),
-  tour: icon('ic-tour'),
-  order: icon('ic-order'),
-  label: icon('ic-label'),
-  blank: icon('ic-blank'),
-  kanban: icon('ic-kanban'),
-  folder: icon('ic-folder'),
-  course: icon('ic-course'),
-  banking: icon('ic-banking'),
-  booking: icon('ic-booking'),
-  invoice: icon('ic-invoice'),
-  product: icon('ic-product'),
-  calendar: icon('ic-calendar'),
-  disabled: icon('ic-disabled'),
-  external: icon('ic-external'),
-  menuItem: icon('ic-menu-item'),
-  ecommerce: icon('ic-ecommerce'),
-  analytics: icon('ic-analytics'),
-  dashboard: icon('ic-dashboard'),
-  parameter: icon('ic-parameter'),
-};
+import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
 export const navData: NavSectionProps['data'] = [
-
   {
     subheader: 'Overview',
     items: [
-      { title: 'Company', path: paths.dashboard.root, icon: ICONS.banking },
-      {title:'Dashboard', path: paths.dashboard.dashboard, icon: ICONS.dashboard },
-      { title: 'Payees', path: paths.dashboard.payees, icon: ICONS.user },
-      { title: 'Payroll', path: paths.dashboard.payroll, icon: ICONS.ecommerce },
-      { title: 'Taxes', path: paths.dashboard.taxes, icon: ICONS.parameter },
-      { title: 'Reports', path: paths.dashboard.reports, icon: ICONS.analytics },
-      { title: 'Settings', path: paths.dashboard.settings, icon: ICONS.external },
+      {
+        title: 'Company',
+        path: paths.dashboard.root,
+        icon: <Iconify icon="noto:office-building" />,
+      },
+      {
+        title: 'Dashboard',
+        path: paths.dashboard.dashboard,
+        icon: <Iconify icon="material-symbols:dashboard-rounded" />,
+      },
+      { title: 'Payees', path: paths.dashboard.payees, icon: <Iconify icon="raphael:employee" /> },
+      {
+        title: 'Payroll',
+        path: paths.dashboard.payroll,
+        icon: <Iconify icon="fa-solid:dollar-sign" />,
+      },
+      { title: 'Taxes', path: paths.dashboard.taxes, icon: <Iconify icon="tabler:tax" /> },
+      {
+        title: 'Reports',
+        path: paths.dashboard.reports,
+        icon: <Iconify icon="mdi:report-finance" />,
+      },
+      { title: 'Settings', path: paths.dashboard.settings, icon: <Iconify icon="ooui:settings" /> },
     ],
   },
- ];
+];
