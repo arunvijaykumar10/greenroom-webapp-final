@@ -8,7 +8,6 @@ import { Iconify } from 'src/components/iconify';
 
 export const navData: NavSectionProps['data'] = [
   {
-    subheader: 'Overview',
     items: [
       {
         title: 'Company',
