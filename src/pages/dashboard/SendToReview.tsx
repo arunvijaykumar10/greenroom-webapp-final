@@ -1,6 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Card, Grid, Stack, Alert, Divider, Typography } from '@mui/material';
+import { 
+  Card, 
+  Grid, 
+  Stack, 
+  Alert, 
+  Divider, 
+  Typography, 
+  Button, 
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Paper,
+  Avatar
+} from '@mui/material';
+// import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { useSelector } from 'src/redux/store';
 
@@ -16,6 +32,8 @@ const renderField = (label: string, value?: string | boolean) => (
 );
 
 export default function SendToReview() {
+  const [openDialog, setOpenDialog] = useState(false);
+  
   const { 
     companyInformation, 
     unionConfiguration, 
@@ -29,6 +47,19 @@ export default function SendToReview() {
   const hasBankSetup = !!bankSetup;
   const hasSignatureSetup = !!signatureSetup;
   const hasPayrollSetup = !!payrollAndTaxes;
+  
+  const handleSendReview = () => {
+    setOpenDialog(true);
+    // Close dialog automatically after 5 seconds
+    setTimeout(() => {
+      setOpenDialog(false);
+    }, 5000);
+    // Additional logic for sending review can be added here
+  };
+  
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   return (
     <Card sx={{ maxWidth: 900, margin: 'auto', p: 2 }}>
@@ -138,6 +169,104 @@ export default function SendToReview() {
           </div>
         )}
       </Stack>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 2 }}>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleSendReview}
+        >
+          Send Review
+        </Button>
+      </Box>
+      
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="review-dialog-title"
+        aria-describedby="review-dialog-description"
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          elevation: 24,
+          sx: { 
+            borderRadius: 2,
+            p: 1
+          }
+        }}
+      >
+        <Paper 
+          elevation={0}
+          sx={{ 
+            textAlign: 'center', 
+            p: 3,
+            backgroundColor: 'background.paper',
+            borderRadius: 2
+          }}
+        >
+          <Avatar 
+            sx={{ 
+              bgcolor: 'success.main', 
+              width: 80, 
+              height: 80, 
+              mx: 'auto',
+              mb: 2
+            }}
+          >
+            {/* <CheckCircleIcon sx={{ fontSize: 50 }} /> */}
+          </Avatar>
+          
+          <DialogTitle 
+            id="review-dialog-title"
+            sx={{ 
+              fontSize: 28, 
+              fontWeight: 'bold',
+              mb: 2
+            }}
+          >
+            Review Submission Successful
+          </DialogTitle>
+          
+          <DialogContent>
+            <DialogContentText 
+              id="review-dialog-description"
+              sx={{ textAlign: 'center' }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
+                Thank you for your submission!
+              </Typography>
+              
+              <Typography paragraph sx={{ fontSize: 18, mt: 2 }}>
+                Your review request has been successfully submitted to our team.
+              </Typography>
+              
+              <Typography 
+                paragraph 
+                sx={{ 
+                  fontSize: 20, 
+                  fontWeight: 'medium',
+                  color: 'primary.main',
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'primary.light',
+                  borderRadius: 1,
+                  backgroundColor: 'primary.lighter',
+                  mt: 3
+                }}
+              >
+                Please wait for 3 working days for the approval.
+              </Typography>
+              
+              <Typography paragraph>
+                Our team will review your information and get back to you as soon as possible.
+              </Typography>
+              
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 3 }}>
+                This window will close automatically in 5 seconds.
+              </Typography>
+            </DialogContentText>
+          </DialogContent>
+        </Paper>
+      </Dialog>
     </Card>
   );
 }
