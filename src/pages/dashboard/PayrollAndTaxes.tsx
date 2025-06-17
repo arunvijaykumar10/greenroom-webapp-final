@@ -1,11 +1,16 @@
 import { useForm, FormProvider } from 'react-hook-form';
 
 import { 
+  Box,
   Card, 
   Stack, 
+  Button,
   MenuItem, 
   Typography 
 } from '@mui/material';
+
+import { useDispatch, useSelector } from 'src/redux/store';
+import { savePayrollAndTaxes } from 'src/redux/slices/formData';
 
 import { RHFSelect, RHFTextField } from 'src/components/hook-form';
 
@@ -17,8 +22,11 @@ const payPeriods = ["Current", "1 week in arrears", "2 weeks in arrears"];
 // ----------------------------------------------------------------------
 
 export default function PayrollAndTaxes() {
+  const dispatch = useDispatch();
+  const savedData = useSelector((state) => state.formData.payrollAndTaxes);
+  
   const methods = useForm({
-    defaultValues: {
+    defaultValues: savedData || {
       payFrequency: "",
       payPeriod: "",
       payScheduleStart: "",
@@ -30,7 +38,8 @@ export default function PayrollAndTaxes() {
   const { handleSubmit } = methods;
 
   const onSubmit = (data: any) => {
-    console.log(data);
+    dispatch(savePayrollAndTaxes(data));
+    console.log('Payroll data saved:', data);
   };
 
   return (
@@ -74,6 +83,16 @@ export default function PayrollAndTaxes() {
               name="checkNumber"
               label="Check Number"
             />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+              <Button 
+                type="submit" 
+                variant="contained" 
+                color="primary"
+                size="large"
+              >
+                Save Payroll Settings
+              </Button>
+            </Box>
           </Stack>
         </Card>
       </form>

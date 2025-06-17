@@ -3,8 +3,12 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { 
   Box, 
   Grid,
-  Card
+  Card,
+  Button
 } from "@mui/material";
+
+import { useDispatch, useSelector } from 'src/redux/store';
+import { saveCompanyInformation } from 'src/redux/slices/formData';
 
 import { RHFTextField, RHFAutocomplete } from 'src/components/hook-form';
 
@@ -14,8 +18,11 @@ const ENTITY_TYPES = ['Corp', 'Partnership', 'Sole Proprietor', 'Non Profit', 'S
 const STATES = ['NY','US'];
 
 const CompanyInformation = () => {
+  const dispatch = useDispatch();
+  const savedData = useSelector((state) => state.formData.companyInformation);
+  
   const methods = useForm<CompanyFormData>({
-    defaultValues: {
+    defaultValues: savedData || {
       entityName: '',
       entityType: '',
       fein: '',
@@ -32,13 +39,12 @@ const CompanyInformation = () => {
   const { handleSubmit } = methods;
 
   const onSubmit = (data: CompanyFormData) => {
+    dispatch(saveCompanyInformation(data));
     console.log('Form submitted:', data);
   };
 
   return (
     <Box sx={{ p: 2 }}>
-
-      
       <FormProvider {...methods}>
         <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
           <Card sx={{ p: 3, mb: 3 }}>
@@ -68,7 +74,7 @@ const CompanyInformation = () => {
                 />
               </Grid>
               
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <RHFTextField 
                   name="fein" 
                   label="FEIN" 
@@ -157,6 +163,18 @@ const CompanyInformation = () => {
                 />
               </Grid>
               
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    color="primary"
+                    size="large"
+                  >
+                    Save Company Information
+                  </Button>
+                </Box>
+              </Grid>
             </Grid>
           </Card>
         </Box>

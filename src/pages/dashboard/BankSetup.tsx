@@ -10,6 +10,9 @@ import {
   Button
 } from '@mui/material';
 
+import { saveBankSetup } from 'src/redux/slices/formData';
+import { useDispatch, useSelector } from 'src/redux/store';
+
 import { RHFSelect, RHFCheckbox, RHFTextField } from 'src/components/hook-form';
 
 import type { BankData, AccountType, BankSetupData } from './types';
@@ -91,7 +94,11 @@ export default function BankSetup() {
     }
   };
 
+  const dispatch = useDispatch();
+  const savedData = useSelector((state) => state.formData.bankSetup);
+
   const onSubmit = (data: BankSetupData) => {
+    dispatch(saveBankSetup(data));
     console.log('Form submitted:', data);
   };
 

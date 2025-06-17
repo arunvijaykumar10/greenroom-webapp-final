@@ -14,13 +14,19 @@ import {
   FormControlLabel
 } from '@mui/material';
 
-import type { SignaturePolicy, SignatureMethod } from './types';
+import { useDispatch, useSelector } from 'src/redux/store';
+import { saveSignatureSetup } from 'src/redux/slices/formData';
+
+import type { SignaturePolicy, SignatureMethod, SignatureSetupData } from './types';
 
 
 export default function SignatureSetup() {
-  const [signaturePolicy, setSignaturePolicy] = useState<SignaturePolicy>('single');
-  const [sig1Method, setSig1Method] = useState<SignatureMethod>('');
-  const [sig2Method, setSig2Method] = useState<SignatureMethod>('');
+  const dispatch = useDispatch();
+  const savedData = useSelector((state) => state.formData.signatureSetup);
+  
+  const [signaturePolicy, setSignaturePolicy] = useState<SignaturePolicy>(savedData?.signaturePolicy || 'single');
+  const [sig1Method, setSig1Method] = useState<SignatureMethod>(savedData?.sig1Method || '');
+  const [sig2Method, setSig2Method] = useState<SignatureMethod>(savedData?.sig2Method || '');
 
   const [sig1File, setSig1File] = useState<File | null>(null);
   const [sig2File, setSig2File] = useState<File | null>(null);
@@ -68,9 +74,14 @@ export default function SignatureSetup() {
     const sig1Data = sig1Method === 'draw' ? sig1PadRef.current?.getTrimmedCanvas().toDataURL('image/png') : null;
     const sig2Data = sig2Method === 'draw' ? sig2PadRef.current?.getTrimmedCanvas().toDataURL('image/png') : null;
     
-    console.log('Signature 1:', sig1Data);
-    console.log('Signature 2:', sig2Data);
-    // Here you would typically save these signatures to your backend
+    const signatureData: SignatureSetupData = {
+      signaturePolicy,
+      sig1Method,
+      sig2Method: signaturePolicy === 'double' ? sig2Method : '',
+    };
+    
+    dispatch(saveSignatureSetup(signatureData));
+    console.log('Signature data saved:', signatureData);
   };
 
   return (

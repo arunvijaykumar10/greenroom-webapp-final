@@ -5,10 +5,14 @@ import {
   Box, 
   Card, 
   Grid,
+  Button,
   Typography
 } from '@mui/material';
 
-import { RHFAutocomplete, RHFTextField, RHFRadioGroup } from 'src/components/hook-form';
+import { useDispatch, useSelector } from 'src/redux/store';
+import { saveUnionConfiguration } from 'src/redux/slices/formData';
+
+import { RHFTextField, RHFRadioGroup, RHFAutocomplete } from 'src/components/hook-form';
 
 import type { AgreementType, UnionConfigurationData } from './types';
 
@@ -27,8 +31,11 @@ const MUSICAL_OR_DRAMATIC_OPTIONS = ['Musical', 'Dramatic'];
 const TIER_OPTIONS = ['Tier 1', 'Tier 2', 'Tier 3'];
 
 export default function UnionConfiguration() {
+  const dispatch = useDispatch();
+  const savedData = useSelector((state) => state.formData.unionConfiguration);
+  
   const methods = useForm<UnionConfigurationData>({
-    defaultValues: {
+    defaultValues: savedData || {
       unionStatus: 'Non-Union',
       union: '',
       agreementType: '',
@@ -98,6 +105,7 @@ export default function UnionConfiguration() {
     agreementType !== '29 Hour Reading';
 
   const onSubmit = (data: UnionConfigurationData) => {
+    dispatch(saveUnionConfiguration(data));
     console.log('Form submitted:', data);
   };
 
@@ -199,6 +207,19 @@ export default function UnionConfiguration() {
                   </Grid>
                 </>
               )}
+              
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    color="primary"
+                    size="large"
+                  >
+                    Save Union Configuration
+                  </Button>
+                </Box>
+              </Grid>
             </Grid>
           </Card>
         </Box>

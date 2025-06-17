@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Card, Grid, Stack, Divider, Typography } from '@mui/material';
+import { Card, Grid, Stack, Alert, Divider, Typography } from '@mui/material';
 
-import { mockBankAccount, mockCompanyInfo, mockUnionConfig, mockPayrollSetup, mockSignatureConfig } from './mockdata';
+import { useSelector } from 'src/redux/store';
 
 const renderField = (label: string, value?: string | boolean) => (
   <Grid item xs={12} sm={6}>
@@ -16,114 +16,127 @@ const renderField = (label: string, value?: string | boolean) => (
 );
 
 export default function SendToReview() {
+  const { 
+    companyInformation, 
+    unionConfiguration, 
+    bankSetup, 
+    signatureSetup, 
+    payrollAndTaxes 
+  } = useSelector((state) => state.formData);
+
+  const hasCompanyInfo = !!companyInformation;
+  const hasUnionConfig = !!unionConfiguration;
+  const hasBankSetup = !!bankSetup;
+  const hasSignatureSetup = !!signatureSetup;
+  const hasPayrollSetup = !!payrollAndTaxes;
+
   return (
     <Card sx={{ maxWidth: 900, margin: 'auto', p: 2 }}>
       <Stack spacing={1} sx={{ p: 3, pb: 1 }}>
         <Typography variant="h6">Setup Summary</Typography>
       </Stack>
       
+      {(!hasCompanyInfo && !hasUnionConfig && !hasBankSetup && !hasSignatureSetup && !hasPayrollSetup) && (
+        <Alert severity="info" sx={{ mx: 3, mb: 3 }}>
+          No information has been saved yet. Please complete the previous steps to see your data here.
+        </Alert>
+      )}
+      
       <Stack spacing={3} sx={{ p: 3 }}>
-        <div>
-          <Typography variant="h6" gutterBottom>
-            Company Information
-          </Typography>
-          <Grid container spacing={2}>
-            {renderField("Entity Name", mockCompanyInfo.entity_name)}
-            {renderField("Entity Type", mockCompanyInfo.entity_type)}
-            {renderField("FEIN", mockCompanyInfo.fein)}
-            {renderField(
-              "NYS Unemployment No",
-              mockCompanyInfo.nys_unemployment_registration_number
-            )}
-            {renderField("Address Line 1", mockCompanyInfo.address_line_1)}
-            {renderField("Address Line 2", mockCompanyInfo.address_line_2)}
-            {renderField("City", mockCompanyInfo.city)}
-            {renderField("State", mockCompanyInfo.state)}
-            {renderField("Zip Code", mockCompanyInfo.zip_code)}
-            {renderField("Phone", mockCompanyInfo.phone_number)}
-          </Grid>
-        </div>
+        {/* Company Information */}
+        {hasCompanyInfo && (
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Company Information
+            </Typography>
+            <Grid container spacing={2}>
+              {renderField("Entity Name", companyInformation.entityName)}
+              {renderField("Entity Type", companyInformation.entityType)}
+              {renderField("FEIN", companyInformation.fein)}
+              {renderField("NYS Unemployment No", companyInformation.nysUnemploymentNumber)}
+              {renderField("Address Line 1", companyInformation.addressLine1)}
+              {renderField("Address Line 2", companyInformation.addressLine2)}
+              {renderField("City", companyInformation.city)}
+              {renderField("State", companyInformation.state)}
+              {renderField("Zip Code", companyInformation.zipCode)}
+              {renderField("Phone", companyInformation.phoneNumber)}
+            </Grid>
+          </div>
+        )}
 
-        <Divider />
+        {hasCompanyInfo && hasUnionConfig && <Divider />}
 
         {/* Union Configuration */}
-        <div>
-          <Typography variant="h6" gutterBottom>
-            Union Configuration
-          </Typography>
-          <Grid container spacing={2}>
-            {renderField(
-              "Union Production",
-              mockUnionConfig.isUnionProduction ? "Yes" : "No"
-            )}
-            {renderField("Union", mockUnionConfig.union)}
-            {renderField("Agreement Type", mockUnionConfig.agreementType)}
-            {renderField("Production Type", mockUnionConfig.productionType)}
-            {renderField("Tier", mockUnionConfig.tier)}
-            {renderField("Employer ID", mockUnionConfig.employerId)}
-            {renderField("Production Title", mockUnionConfig.productionTitle)}
-            {renderField("Business Rep", mockUnionConfig.businessRep)}
-          </Grid>
-        </div>
+        {hasUnionConfig && (
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Union Configuration
+            </Typography>
+            <Grid container spacing={2}>
+              {renderField("Union Status", unionConfiguration.unionStatus)}
+              {renderField("Union", unionConfiguration.union)}
+              {renderField("Agreement Type", unionConfiguration.agreementType)}
+              {renderField("Production Type", unionConfiguration.musicalOrDramatic)}
+              {renderField("Tier", unionConfiguration.tier)}
+              {renderField("Employer ID", unionConfiguration.aeaEmployerId)}
+              {renderField("Production Title", unionConfiguration.aeaProductionTitle)}
+              {renderField("Business Rep", unionConfiguration.aeaBusinessRep)}
+            </Grid>
+          </div>
+        )}
 
-        <Divider />
+        {hasUnionConfig && hasBankSetup && <Divider />}
 
         {/* Bank Account */}
-        <div>
-          <Typography variant="h6" gutterBottom>
-            Bank Account
-          </Typography>
-          <Grid container spacing={2}>
-            {renderField("Bank Name", mockBankAccount.bankName)}
-            {renderField(
-              "Routing Number (ACH)",
-              mockBankAccount.routingNumberACH
-            )}
-            {renderField(
-              "Routing Number (Wire)",
-              mockBankAccount.routingNumberWire
-            )}
-            {renderField("Account Number", mockBankAccount.accountNumber)}
-            {renderField("Account Type", mockBankAccount.accountType)}
-            {renderField(
-              "Authorized Transactions",
-              mockBankAccount.isAuthorized ? "Yes" : "No"
-            )}
-          </Grid>
-        </div>
+        {hasBankSetup && (
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Bank Account
+            </Typography>
+            <Grid container spacing={2}>
+              {renderField("Bank Name", bankSetup.bankName)}
+              {renderField("Routing Number (ACH)", bankSetup.routingACH)}
+              {renderField("Routing Number (Wire)", bankSetup.routingWire)}
+              {renderField("Account Number", bankSetup.accountNumber)}
+              {renderField("Account Type", bankSetup.accountType)}
+              {renderField("Authorized Transactions", bankSetup.authorize ? "Yes" : "No")}
+            </Grid>
+          </div>
+        )}
 
-        <Divider />
+        {hasBankSetup && hasSignatureSetup && <Divider />}
 
         {/* Signature Configuration */}
-        <div>
-          <Typography variant="h6" gutterBottom>
-            Signature Configuration
-          </Typography>
-          <Grid container spacing={2}>
-            {renderField("Signature Policy", mockSignatureConfig.signaturePolicy)}
-            {renderField("Signature 1 Type", mockSignatureConfig.signature1.type)}
-            {renderField(
-              "Signature 2 Type",
-              mockSignatureConfig.signature2?.type || "N/A"
-            )}
-          </Grid>
-        </div>
+        {hasSignatureSetup && (
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Signature Configuration
+            </Typography>
+            <Grid container spacing={2}>
+              {renderField("Signature Policy", signatureSetup.signaturePolicy)}
+              {renderField("Signature 1 Method", signatureSetup.sig1Method)}
+              {renderField("Signature 2 Method", signatureSetup.sig2Method || "N/A")}
+            </Grid>
+          </div>
+        )}
 
-        <Divider />
+        {hasSignatureSetup && hasPayrollSetup && <Divider />}
 
         {/* Payroll Setup */}
-        <div>
-          <Typography variant="h6" gutterBottom>
-            Payroll Setup
-          </Typography>
-          <Grid container spacing={2}>
-            {renderField("Pay Frequency", mockPayrollSetup.payFrequency)}
-            {renderField("Pay Period", mockPayrollSetup.payPeriod)}
-            {renderField("Schedule Start", mockPayrollSetup.payScheduleStart)}
-            {renderField("Timesheet Due", mockPayrollSetup.timesheetDue)}
-            {renderField("Check Number", mockPayrollSetup.checkNumber)}
-          </Grid>
-        </div>
+        {hasPayrollSetup && (
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Payroll Setup
+            </Typography>
+            <Grid container spacing={2}>
+              {renderField("Pay Frequency", payrollAndTaxes.payFrequency)}
+              {renderField("Pay Period", payrollAndTaxes.payPeriod)}
+              {renderField("Schedule Start", payrollAndTaxes.payScheduleStart)}
+              {renderField("Timesheet Due", payrollAndTaxes.timesheetDue)}
+              {renderField("Check Number", payrollAndTaxes.checkNumber)}
+            </Grid>
+          </div>
+        )}
       </Stack>
     </Card>
   );

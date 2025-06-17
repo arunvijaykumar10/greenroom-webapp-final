@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { styled } from '@mui/material/styles';
 import { 
@@ -6,15 +6,18 @@ import {
   Step, 
   Card, 
   Paper, 
-  Button, 
+  alpha, 
+  Button,
   Stepper,
   Container,
   StepLabel,
   Typography,
   StepConnector,
-  stepConnectorClasses,
-  alpha
+  stepConnectorClasses
 } from "@mui/material";
+
+import { resetFormData } from 'src/redux/slices/formData';
+import { useDispatch, useSelector } from 'src/redux/store';
 
 import BankSetup from './BankSetup';
 import InviteAdmin from './InviteAdmin';
@@ -106,8 +109,24 @@ const StepContentWrapper = styled(Box)(({ theme }) => ({
 }));
 
 export default function Dashboard() {
+  const dispatch = useDispatch();
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{[k: number]: boolean}>({});
+  
+  const formData = useSelector((state) => state.formData);
+  
+  // Mark steps as completed based on saved data
+  useEffect(() => {
+    const newCompleted = { ...completed };
+    
+    if (formData.companyInformation) newCompleted[0] = true;
+    if (formData.unionConfiguration) newCompleted[1] = true;
+    if (formData.bankSetup) newCompleted[2] = true;
+    if (formData.signatureSetup) newCompleted[3] = true;
+    if (formData.payrollAndTaxes) newCompleted[4] = true;
+    
+    setCompleted(newCompleted);
+  }, [formData]);
 
   const steps = [
     {
@@ -162,6 +181,7 @@ export default function Dashboard() {
   const handleReset = () => {
     setActiveStep(0);
     setCompleted({});
+    dispatch(resetFormData());
   };
 
   return (

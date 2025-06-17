@@ -12,19 +12,21 @@ import {
 } from 'react-redux';
 
 import api from './api';
+import formDataReducer from './slices/formData';
 
 // ----------------------------------------------------------------------
 const rootPersistConfig = {
     key: 'root',
     storage,
     keyPrefix: 'redux-',
-    whitelist: [],
+    whitelist: ['formData'],
 };
 
 const apiReducers = _.reduce(api, (acc, val) => ({ ...acc, [val.reducerPath]: val.reducer }), {});
 
 const rootReducer = combineReducers({
     ...apiReducers,
+    formData: formDataReducer,
 });
 
 const apiMiddlewares = _.map(api, 'middleware');
